@@ -29,7 +29,7 @@ namespace AnimationStarter
         {
             WalkLeft,
             FaceLeft,
-            Standing,
+            Stand,
             FaceRight,
             WalkRight,
             Jump
@@ -39,8 +39,8 @@ namespace AnimationStarter
         private float XPos = 200;
         private float YPos = 200;
 
-        private MarioState MarioPreviousState = MarioState.Standing;
-        private MarioState MarioCurrentState = MarioState.Standing;
+        private MarioState MarioPreviousState = MarioState.Stand;
+        private MarioState MarioCurrentState = MarioState.Stand;
 
         public Game1()
         {
@@ -131,7 +131,6 @@ namespace AnimationStarter
                 // Remove one "frame" worth of time
                 timeCounter -= secondsPerFrame;
             }
-
         }
 
         /// <summary>
@@ -148,60 +147,27 @@ namespace AnimationStarter
             // *** and properly draw mario here
 
             // Example call to draw mario walking (replace or adjust this line!)
-            //DrawMarioWalking(SpriteEffects.FlipHorizontally);
             DrawMario();
-
 
             spriteBatch.End();
 
             base.Draw(gameTime);
         }
-
+        
         /// <summary>
-        /// Draws mario with a walking animation
+        /// Determines which way Mario is facing and applies the appropriate
+        ///   SpriteEffects.  Also defines the section from the SpriteSheet
+        ///   that is to be drawn.
         /// </summary>
-        /// <param name="flip">Should he be flipped horizontally?</param>
-        private void DrawMarioWalking(SpriteEffects flip)
-        {
-            spriteBatch.Draw(
-                marioTexture,
-                marioPosition,
-                new Rectangle(widthOfSingleSprite * currentFrame, 0, widthOfSingleSprite, marioTexture.Height),
-                Color.White,
-                0.0f,
-                Vector2.Zero,
-                1.0f,
-                flip,
-                0.0f);
-        }
-
-        /// <summary>
-        /// Draws mario standing still
-        /// </summary>
-        /// <param name="flip">Should he be flipped horizontally?</param>
-        private void DrawMarioStandinging(SpriteEffects flip)
-        {
-            spriteBatch.Draw(
-                marioTexture,
-                marioPosition,
-                new Rectangle(0, 0, widthOfSingleSprite, marioTexture.Height),
-                Color.White,
-                0.0f,
-                Vector2.Zero,
-                1.0f,
-                flip,
-                0.0f);
-        }
-
         private void DrawMario()
         {
             Rectangle currentMario = new Rectangle();
             SpriteEffects flips = SpriteEffects.None;
 
-            if (MarioCurrentState == MarioState.FaceLeft ||
+            if (MarioCurrentState == MarioState.FaceLeft ||             // Size definition if Mario is facing left
                 MarioCurrentState == MarioState.WalkLeft)                
             {
-                flips = SpriteEffects.FlipHorizontally;
+                flips = SpriteEffects.FlipHorizontally;                 // If mario is facing other way, flip sprite
 
                 currentMario = new Rectangle(
                                    widthOfSingleSprite * currentFrame,
@@ -209,7 +175,7 @@ namespace AnimationStarter
                                    widthOfSingleSprite,
                                    marioTexture.Height);
             }
-            else if (MarioCurrentState == MarioState.FaceRight ||
+            else if (MarioCurrentState == MarioState.FaceRight ||       // Size definition if Mario is facing right
                 MarioCurrentState == MarioState.WalkRight)
             {
                 currentMario = new Rectangle(
@@ -218,7 +184,7 @@ namespace AnimationStarter
                                    widthOfSingleSprite,
                                    marioTexture.Height);
             }
-            else
+            else                                                        // If size definition if Mario is not moving
             {
                 currentMario = new Rectangle(
                                    0,
@@ -227,15 +193,10 @@ namespace AnimationStarter
                                    marioTexture.Height);
             }
             
-            spriteBatch.Draw(
+            spriteBatch.Draw(                                           // Draw the sprite from the spriteBatch
                 marioTexture,
                 marioPosition,
                 currentMario,
-                //new Rectangle(
-                //    widthOfSingleSprite * currentFrame,
-                //    0,
-                //    widthOfSingleSprite,
-                //    marioTexture.Height),
                 Color.White,
                 0.0f,
                 Vector2.Zero,
@@ -244,6 +205,9 @@ namespace AnimationStarter
                 0.0f);
         }
 
+        /// <summary>
+        /// Takes user input and analysis state to define next state.
+        /// </summary>
         private void ProcessInput()
         {
             KeyboardState keyboardState = Keyboard.GetState();
@@ -260,9 +224,9 @@ namespace AnimationStarter
                 }
                 else if (MarioPreviousState == MarioState.FaceRight)
                 {
-                    MarioCurrentState = MarioState.Standing;
+                    MarioCurrentState = MarioState.Stand;
                 }
-                else if (MarioPreviousState == MarioState.Standing)
+                else if (MarioPreviousState == MarioState.Stand)
                 {                    
                     MarioCurrentState = MarioState.FaceLeft;
                 }
@@ -282,9 +246,9 @@ namespace AnimationStarter
                 }
                 else if (MarioPreviousState == MarioState.FaceLeft)
                 {
-                    MarioCurrentState = MarioState.Standing;
+                    MarioCurrentState = MarioState.Stand;
                 }
-                else if (MarioPreviousState == MarioState.Standing)
+                else if (MarioPreviousState == MarioState.Stand)
                 {
                     MarioCurrentState = MarioState.FaceRight;
                 }
@@ -304,79 +268,15 @@ namespace AnimationStarter
                 YPos = YPos + 5;
             }
 
-            if (keyboardState.IsKeyUp(Keys.W) &&
+            if (keyboardState.IsKeyUp(Keys.W) &&                    // If all keys are up, Mario is standing
                 keyboardState.IsKeyUp(Keys.A) &&
                 keyboardState.IsKeyUp(Keys.S) &&
                 keyboardState.IsKeyUp(Keys.D))
             {
-                MarioCurrentState = MarioState.Standing;
+                MarioCurrentState = MarioState.Stand;
             }
 
-            marioPosition = new Vector2(XPos, YPos);            // Update characterPosition variable
+            marioPosition = new Vector2(XPos, YPos);                // Update characterPosition variable
         }
-
-        //private void UpdateState()
-        //{
-        //    MarioPreviousState = MarioCurrentState;
-
-        //    KeyboardState keyboardState = Keyboard.GetState();
-
-        //    Keys[] pressedKeys = keyboardState.GetPressedKeys();
-
-        //    for (int i = 0; i < pressedKeys.Length; i++)
-        //    {
-        //        switch (pressedKeys[i])
-        //        {
-        //            case Keys.A:
-        //                if (MarioPreviousState == MarioState.WalkRight)
-        //                {
-        //                    MarioCurrentState = MarioState.FaceRight;
-        //                }
-        //                else if (MarioPreviousState == MarioState.FaceRight)
-        //                {
-        //                    MarioCurrentState = MarioState.Standing;
-        //                }
-        //                else if (MarioPreviousState == MarioState.Standing)
-        //                {
-        //                    MarioCurrentState = MarioState.FaceLeft;
-        //                }
-        //                else if (MarioPreviousState == MarioState.FaceLeft)
-        //                {
-        //                    MarioCurrentState = MarioState.WalkLeft;
-        //                }
-
-        //                break;
-        //            case Keys.S:
-        //                MarioCurrentState = MarioState.Standing;
-
-        //                break;
-        //            case Keys.D:
-        //                if (MarioPreviousState == MarioState.WalkLeft)
-        //                {
-        //                    MarioCurrentState = MarioState.FaceLeft;
-        //                }
-        //                else if (MarioPreviousState == MarioState.FaceLeft)
-        //                {
-        //                    MarioCurrentState = MarioState.Standing;
-        //                }
-        //                else if (MarioPreviousState == MarioState.Standing)
-        //                {
-        //                    MarioCurrentState = MarioState.FaceRight;
-        //                }
-        //                else if (MarioPreviousState == MarioState.FaceRight)
-        //                {
-        //                    MarioCurrentState = MarioState.WalkRight;
-        //                }
-
-        //                break;
-        //            case Keys.W:
-        //                MarioCurrentState = MarioState.Jump;
-
-        //                break;
-        //            default:
-        //                break;
-        //        }
-        //    }
-        //}
     }
 }
