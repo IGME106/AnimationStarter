@@ -24,11 +24,37 @@ namespace AnimationStarter
 		double secondsPerFrame;
 		double timeCounter;
 
-		public Game1()
+        // Mario Statemachine
+        private enum MarioState
+        {
+            WalkLeft,
+            FaceLeft,
+            Stand,
+            FaceRight,
+            WalkRight
+        }
+
+        // Mario Position
+        private float XPos = 200;
+        private float YPos = 200;
+
+        private int movePhase = 0;
+
+        private MarioState MarioPreviousState = MarioState.Stand;
+        private MarioState MarioCurrentState = MarioState.Stand;
+
+        public Game1()
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
-		}
+
+            Window.Position = new Point(                    // Center the game view on the screen
+                (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2) -
+                    (graphics.PreferredBackBufferWidth / 2),
+                (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2) -
+                    (graphics.PreferredBackBufferHeight / 2)
+            );
+        }
 
 		/// <summary>
 		/// Allows the game to perform any initialization it needs to before starting to run.
@@ -39,7 +65,7 @@ namespace AnimationStarter
 		protected override void Initialize()
 		{
 			// TODO: Add your initialization logic here
-
+            
 			base.Initialize();
 		}
 
@@ -56,7 +82,7 @@ namespace AnimationStarter
 			numSpritesInSheet = 4;
 			widthOfSingleSprite = marioTexture.Width / numSpritesInSheet;
 
-			marioPosition = new Vector2(200, 200);
+			marioPosition = new Vector2(XPos, YPos);
 
 			// Set up animation stuff
 			currentFrame = 1;
@@ -76,10 +102,30 @@ namespace AnimationStarter
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
 				Exit();
 
-			// *** Put code to check and update FINITE STATE MACHINE here
+            // *** Put code to check and update FINITE STATE MACHINE here
 
+            ProcessInput();
+            
+            switch (MarioCurrentState)
+            {
+                case MarioState.Stand:
 
+                    break;
+                case MarioState.FaceLeft:
 
+                    break;
+                case MarioState.WalkLeft:
+
+                    break;
+                case MarioState.FaceRight:
+
+                    break;
+                case MarioState.WalkRight:
+
+                    break;
+                default:
+                    break;
+            }
 
 
 			// Update the animation
@@ -168,5 +214,77 @@ namespace AnimationStarter
 				0.0f);
 		}
 
-	}
+        private void DrawMario(SpriteEffects flip)
+        {
+            spriteBatch.Draw(
+                marioTexture,
+                marioPosition,
+                new Rectangle(
+                    widthOfSingleSprite * currentFrame,
+                    0,
+                    widthOfSingleSprite,
+                    marioTexture.Height),
+                Color.White,
+                0.0f,
+                Vector2.Zero,
+                1.0f,
+                flip,
+                0.0f);
+        }
+
+        private void ProcessInput()
+        {
+            KeyboardState keyboardState = Keyboard.GetState();
+            
+            if (keyboardState.IsKeyDown(Keys.A))                    // Move left
+            {
+                XPos = XPos - 5;
+
+                
+            }
+
+            if (keyboardState.IsKeyDown(Keys.D))                    // Move right
+            {
+                XPos = XPos + 5;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.W))                    // Move up
+            {
+                YPos = YPos - 5;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.S))                    // Move down
+            {
+                YPos = YPos + 5;
+            }
+
+            marioPosition = new Vector2(XPos, YPos);            // Update characterPosition variable
+        }
+
+        private void UpdateState(string keyPressed)
+        {
+            MarioPreviousState = MarioCurrentState;
+
+            switch (keyPressed)
+            {
+                case "A":
+                    MarioCurrentState = MarioState.FaceLeft;
+
+                    break;
+                case "S":
+                    break;
+                case "D":
+                    break;
+                case "W":
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void PhaseShift()
+        {
+
+        }
+    }
 }
